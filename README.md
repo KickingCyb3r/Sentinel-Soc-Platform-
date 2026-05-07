@@ -1,3 +1,4 @@
+[soc-analyst-v3.html](https://github.com/user-attachments/files/27499687/soc-analyst-v3.html)
 # Sentinel-Soc-Platform-
 SENTINEL — Tier 1 SOC Analyst Platform
 An AI-powered SOC dashboard built for Tier 1 analysts. SENTINEL simulates real-world alert investigation workflows including triage, threat intelligence analysis, containment, and incident documentation.
