@@ -1,267 +1,272 @@
-````markdown
-# SENTINEL — SOC Operations Platform
+Yes — there are several things in this README that either should NOT be public on GitHub yet, or should be cleaned up to look more professional and recruiter-ready.
 
-> AI-powered SOC analyst platform designed to simulate real-world security operations workflows including alert triage, threat intelligence analysis, incident investigation, and response execution. :contentReference[oaicite:0]{index=0}
-
-![Version](https://img.shields.io/badge/version-3.0-blue?style=flat-square)
-![Status](https://img.shields.io/badge/status-active-brightgreen?style=flat-square)
-![License](https://img.shields.io/badge/license-MIT-lightgrey?style=flat-square)
+Here’s what I would remove, replace, or tighten up:
 
 ---
 
-# Overview
+# Remove or Replace These Immediately
 
-SENTINEL is a browser-based Security Operations Center (SOC) platform built to simulate enterprise-level security workflows used during active investigations.
+## 1. Fake Links / Placeholder URLs
 
-The platform enables analysts to:
-- Triage and prioritize alerts
-- Investigate indicators of compromise (IOCs)
-- Review threat intelligence
-- Map MITRE ATT&CK techniques
-- Execute response workflows
-- Document incidents
-- Simulate SIEM-driven investigations
+These hurt credibility if someone clicks them.
 
-Anthropic Claude powers AI-assisted investigation summaries and analyst support throughout the alert lifecycle.
+### Replace:
 
----
+```bash
+https://yourusername.github.io/sentinel-soc-platform/soc-analyst-v3.html
+```
 
-# Features
+```bash
+github.com/yourusername
+```
 
-## Alert Management
-- Real-time alert queue
-- Severity-based prioritization
-- Risk scoring visualization
-- Alert escalation and closure workflows
+```bash
+linkedin.com/in/yourprofile
+```
 
----
+### With:
 
-## AI-Assisted Investigations
-- AI-generated investigation summaries
-- Attacker intent analysis
-- Recommended response actions
-- Context-aware analyst chat
-- MITRE ATT&CK-aware analysis
+* Your real GitHub
+* Your real LinkedIn
+* Or remove entirely until deployed
 
 ---
 
-## Threat Intelligence
-- VirusTotal integration
-- AbuseIPDB integration
-- IOC reputation analysis
-- IP, domain, URL, and hash investigation
-- Bulk IOC analysis support
+# 2. API Key Examples
+
+This section is okay for documentation, but tighten it.
+
+### Current:
+
+```env
+ANTHROPIC_API_KEY=your_key_here
+```
+
+### Better:
+
+```env
+ANTHROPIC_API_KEY=YOUR_API_KEY
+```
+
+Also:
+
+* NEVER upload `.env`
+* Add `.env` to `.gitignore`
 
 ---
 
-## Investigation Workspace
+# 3. Remove “Cybersecurity Professional in Transition”
 
-Each investigation includes:
-- Overview
-- Threat Intelligence
-- Timeline
-- Raw Logs
-- AI Chat
+This weakens your positioning.
 
-Additional capabilities:
-- Timeline reconstruction
-- Playbook execution tracking
-- MITRE ATT&CK tagging
+### Current:
 
----
+> cybersecurity professional in transition targeting SOC roles
 
-## SIEM Integration
+### Replace With:
 
-Supports integration concepts for:
-- Splunk
-- Elastic SIEM
-- Microsoft Sentinel
-- IBM QRadar
-- Google Chronicle
-- Generic JSON webhooks
+> SOC Analyst focused on threat detection, incident response, and AI-assisted security operations.
+
+You already do the work. Position yourself as the role.
 
 ---
 
-# Tech Stack
+# 4. Remove “Single-File Application”
 
-| Layer | Technology |
-|---|---|
-| Frontend | HTML, CSS, JavaScript |
-| AI Analysis | Anthropic Claude Sonnet |
-| Threat Intelligence | VirusTotal API, AbuseIPDB API |
-| Backend | Node.js / Express |
-| Deployment | GitHub Pages |
+It sounds beginner-level.
+
+### Current:
+
+> built as a single-file web application
+
+### Better:
+
+> browser-based SOC analyst platform
 
 ---
 
-# Architecture
+# 5. Tighten the Architecture Section
+
+The current architecture section is overly verbose.
+
+### Keep:
 
 ```text
 Browser Dashboard
-│
 ├── Alert Queue
 ├── AI Analysis Module
 ├── Threat Intelligence Module
 └── SIEM Integration Layer
 ```
 
-Backend proxy responsibilities:
-- API key protection
-- CORS handling
-- External API communication
-- AI request routing
+### Remove:
+
+* Long production explanations
+* Repeated API descriptions
+* Excessive arrows/ASCII clutter
+
+Recruiters skim.
 
 ---
 
-# Getting Started
+# 6. Remove “AI Simulation Fallback”
 
-## Requirements
+This sounds fake/demo-heavy.
 
-- Node.js 18+
+### Current:
+
+> AI simulation used otherwise
+
+### Better:
+
+> Optional API integrations supported
 
 ---
 
-## Clone Repository
+# 7. Reduce the MITRE Table
 
-```bash
-git clone https://github.com/YOUR_USERNAME/sentinel-soc-platform.git
-cd sentinel-soc-platform
+Keep only the strongest examples.
+
+### Keep:
+
+* T1110.004
+* T1078
+* T1486
+* T1071.004
+
+Too many rows makes it look bloated.
+
+---
+
+# 8. Remove “Operation Breakthrough 2026”
+
+That’s internal branding.
+
+GitHub recruiters care about:
+
+* technical capability
+* architecture
+* workflow understanding
+* implementation
+
+Not motivational program names.
+
+---
+
+# 9. Shorten the Feature List
+
+Right now it reads like marketing copy.
+
+Keep:
+
+* Alert triage
+* IOC analysis
+* Threat intelligence
+* AI-assisted investigations
+* SIEM integration
+* MITRE mapping
+* Response workflows
+
+Cut:
+
+* “five-metric dashboard bar”
+* “severity strips”
+* “visual score persistence”
+* cosmetic UI wording
+
+---
+
+# 10. Remove “Tier 1” Repetition
+
+You say Tier 1 too many times.
+
+Once in the title is enough.
+
+---
+
+# What Recruiters Actually Want to See
+
+## Keep These Strong Sections
+
+* Overview
+* Features
+* Tech Stack
+* Architecture
+* Getting Started
+* MITRE Coverage
+* Screenshots (VERY important)
+* Demo link
+* Clean code structure
+
+---
+
+# Biggest Missing Piece
+
+You need screenshots.
+
+Add:
+
+```markdown
+# Dashboard Preview
+
+![Dashboard Screenshot](images/dashboard.png)
 ```
 
----
-
-## Install Dependencies
-
-```bash
-cd proxy
-npm install
-```
+This instantly increases perceived quality.
 
 ---
 
-## Configure Environment Variables
+# Files You SHOULD NOT Push to GitHub
 
-```bash
-cp .env.example .env
-```
-
-Example:
-
-```env
-ANTHROPIC_API_KEY=YOUR_API_KEY
-VIRUSTOTAL_API_KEY=YOUR_API_KEY
-ABUSEIPDB_API_KEY=YOUR_API_KEY
-PORT=3000
-```
-
----
-
-## Start Backend Proxy
-
-```bash
-npm start
-```
-
----
-
-## Open Dashboard
-
-```text
-http://localhost:3000
-```
-
----
-
-# SIEM Webhook Example
-
-```json
-{
-  "alert_id": "ALT-2024-001",
-  "severity": "HIGH",
-  "source": "Splunk",
-  "host": "finance-server-01",
-  "src_ip": "192.168.1.50",
-  "user": "jdoe",
-  "action": "BLOCKED",
-  "mitre": ["T1078"],
-  "raw_log": "sample log data"
-}
-```
-
----
-
-# Investigation Workflow
-
-```text
-1. Review Alert Queue
-2. Prioritize Risk
-3. Investigate Alert
-4. Analyze Threat Intelligence
-5. Review Timeline & Logs
-6. Execute Response Workflow
-7. Document Findings
-8. Escalate or Close Incident
-```
-
----
-
-# MITRE ATT&CK Coverage
-
-| Technique | ID |
-|---|---|
-| Credential Stuffing | T1110.004 |
-| Valid Accounts | T1078 |
-| Pass the Hash | T1550.002 |
-| Data Encrypted for Impact | T1486 |
-| DNS Command and Control | T1071.004 |
-
----
-
-# Roadmap
-
-- [ ] Campaign correlation engine
-- [ ] Sigma/KQL rule generation
-- [ ] Analyst performance tracking
-- [ ] PDF incident report exports
-- [ ] Dark mode support
-
----
-
-# Security Notes
-
-Never upload:
-- `.env` files
-- API keys
-- Real customer logs
-- Sensitive IOC datasets
-
-Recommended `.gitignore`:
+Add this to `.gitignore`
 
 ```gitignore
 .env
 node_modules/
 .DS_Store
+coverage/
 dist/
 *.log
 ```
 
----
+Never upload:
 
-# License
-
-MIT License
-
----
-
-# Contact
-
-**Jarius Glover**  
-SOC Operations | Threat Analysis | Incident Response
-
-- LinkedIn: linkedin.com/in/jariusglover1
-- GitHub: github.com/YOUR_USERNAME
+* API keys
+* Real IOC datasets
+* Real logs with sensitive data
+* Internal notes
+* Personal planning docs
 
 ---
 
-> *“The best analysts don’t just close alerts — they understand attacks.”*
-````
+# Recommended Final README Structure
+
+```markdown
+# SENTINEL — SOC Analyst Platform
+
+## Overview
+## Features
+## Dashboard Preview
+## Tech Stack
+## Architecture
+## Getting Started
+## MITRE ATT&CK Coverage
+## Roadmap
+## Contact
+```
+
+Simple. Clean. Professional.
+
+---
+
+# Biggest Improvement You Can Make
+
+Turn this from:
+
+> “portfolio project”
+
+Into:
+
+> “SOC operations simulation platform”
+
+That wording sounds significantly more enterprise-level and recruiter-ready.
