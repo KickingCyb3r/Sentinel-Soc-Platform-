@@ -1,5 +1,5 @@
 # Sentinel-Soc-Platform-
-# SENTINEL ‚Äî Tier 1 SOC Analyst Platform
+# SENTINEL ‚Ai Tier 1 SOC Analyst Platform
 
 > An AI-powered Security Operations Center dashboard built for Tier 1 analysts. Covers the full alert investigation lifecycle ‚Äî from triage and threat intelligence to containment and documentation.
 
@@ -318,7 +318,7 @@ MIT License ‚Äî free to use, modify, and distribute with attribution.
 Built by **Jarius** ‚Äî cybersecurity professional in transition targeting SOC and security operations roles.
 
 - GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [linkedin.com/in/yourprofile](https://linkedin.com/in/yourprofile)
+- LinkedIn: [linkedin.com/in/yourprofile](https://www.linkedin.com/in/jariusglover1/)
 
 ---
 
