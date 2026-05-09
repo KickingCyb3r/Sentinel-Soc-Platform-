@@ -288,7 +288,7 @@ Free to use, modify, and distribute with attribution.
 Cybersecurity | SOC Operations | Threat Analysis
 
 * LinkedIn: `linkedin.com/in/jariusglover1`
-* GitHub: `github.com/yourusername`
+* GitHub: `git clone https://github.com/KickingCyb3r/Sentinel-Soc-Platform-.git`
 
 ---
 
