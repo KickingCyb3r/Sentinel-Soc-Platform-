@@ -155,7 +155,7 @@ AI functionality requires backend API integration.
 ## Clone Repository
 
 ```bash
-git clone https://github.com/yourusername/sentinel-soc-platform.git
+git clone https://github.com/KickingCyb3r/Sentinel-Soc-Platform-.git
 cd sentinel-soc-platform
 ```
 
