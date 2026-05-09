@@ -1,0 +1,2073 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SENTINEL // SOC Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink-950: #080b0f;
+  --ink-900: #0d1117;
+  --ink-800: #141b24;
+  --ink-700: #1c2535;
+  --ink-600: #253041;
+  --ink-500: #354255;
+  --ink-400: #4e607a;
+  --ink-300: #7a92ae;
+  --ink-200: #a8bccc;
+  --ink-100: #d4e0ea;
+  --ink-50:  #eef3f7;
+
+  --accent:     #3b82f6;
+  --accent-dim: #1d4ed8;
+  --accent-bg:  rgba(59,130,246,0.08);
+  --accent-bd:  rgba(59,130,246,0.25);
+
+  --red:        #ef4444;
+  --red-bg:     rgba(239,68,68,0.08);
+  --red-bd:     rgba(239,68,68,0.25);
+  --red-text:   #fca5a5;
+
+  --amber:      #f59e0b;
+  --amber-bg:   rgba(245,158,11,0.08);
+  --amber-bd:   rgba(245,158,11,0.25);
+  --amber-text: #fcd34d;
+
+  --green:      #10b981;
+  --green-bg:   rgba(16,185,129,0.08);
+  --green-bd:   rgba(16,185,129,0.25);
+  --green-text: #6ee7b7;
+
+  --purple:     #8b5cf6;
+  --purple-bg:  rgba(139,92,246,0.08);
+  --purple-bd:  rgba(139,92,246,0.25);
+
+  --mono: 'DM Mono', monospace;
+  --display: 'Syne', sans-serif;
+  --body: 'DM Sans', sans-serif;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --border: 1px solid var(--ink-700);
+  --border-hi: 1px solid var(--ink-600);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--ink-950);
+  color: var(--ink-100);
+  font-family: var(--body);
+  font-size: 13px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SCROLLBARS ── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--ink-600); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink-500); }
+
+/* ── TOP NAV ── */
+.topnav {
+  height: 52px;
+  min-height: 52px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  background: var(--ink-900);
+  border-bottom: var(--border);
+  gap: 0;
+  position: relative;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 32px;
+}
+
+.brand-mark {
+  width: 28px;
+  height: 28px;
+  background: var(--accent);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.brand-mark svg { width: 16px; height: 16px; color: #fff; }
+
+.brand-name {
+  font-family: var(--display);
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.brand-ver {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-400);
+  letter-spacing: 1px;
+  background: var(--ink-800);
+  padding: 1px 5px;
+  border-radius: 3px;
+  border: var(--border);
+}
+
+.nav-divider { width: 1px; height: 20px; background: var(--ink-700); margin: 0 12px; }
+
+.nav-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-300);
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.15s;
+  font-family: var(--body);
+  background: none;
+}
+
+.nav-pill:hover { background: var(--ink-800); color: var(--ink-100); border-color: var(--ink-700); }
+.nav-pill.active { background: var(--accent-bg); color: var(--accent); border-color: var(--accent-bd); }
+.nav-pill svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+.nav-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.threat-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  background: var(--amber-bg);
+  border: 1px solid var(--amber-bd);
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--amber-text);
+  letter-spacing: 0.5px;
+}
+
+.live-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--green);
+  animation: livepulse 2s ease-in-out infinite;
+}
+
+@keyframes livepulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+.clock-display {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-300);
+  background: var(--ink-800);
+  padding: 4px 10px;
+  border-radius: var(--radius-md);
+  border: var(--border);
+}
+
+/* ── METRIC BAR ── */
+.metric-bar {
+  height: auto;
+  min-height: 64px;
+  flex-shrink: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  border-bottom: var(--border);
+  background: var(--ink-900);
+  overflow: hidden;
+}
+
+.metric-cell {
+  padding: 10px 14px;
+  border-right: var(--border);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.metric-cell:last-child { border-right: none; }
+
+.metric-label {
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--ink-400);
+  text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metric-val {
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.metric-delta {
+  font-size: 9px;
+  color: var(--ink-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.mv-red    { color: var(--red); }
+.mv-amber  { color: var(--amber); }
+.mv-blue   { color: var(--accent); }
+.mv-green  { color: var(--green); }
+.mv-purple { color: var(--purple); }
+
+/* ── MAIN LAYOUT ── */
+.workspace {
+  display: grid;
+  grid-template-columns: 260px 1fr 288px;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── LEFT PANEL ── */
+.left-panel {
+  border-right: var(--border);
+  background: var(--ink-900);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel-head {
+  padding: 14px 16px 10px;
+  border-bottom: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.panel-head-title {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--ink-400);
+  text-transform: uppercase;
+}
+
+.count-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.cb-red    { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-bd); }
+.cb-blue   { background: var(--accent-bg); color: var(--accent); border: 1px solid var(--accent-bd); }
+.cb-green  { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-bd); }
+.cb-amber  { background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-bd); }
+.cb-purple { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+
+.alert-queue {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.alert-row {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.12s;
+  background: transparent;
+}
+
+.alert-row:hover { background: var(--ink-800); border-color: var(--ink-600); }
+.alert-row.selected { background: var(--ink-800); border-color: var(--accent-bd); }
+
+.sev-strip { width: 3px; flex-shrink: 0; }
+.ss-critical { background: var(--red); }
+.ss-high     { background: var(--amber); }
+.ss-medium   { background: var(--purple); }
+.ss-low      { background: var(--green); }
+
+.alert-body { padding: 9px 11px; flex: 1; min-width: 0; }
+
+.alert-row-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 3px;
+}
+
+.sev-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  border-radius: 3px;
+}
+
+.sl-critical { background: var(--red-bg); color: var(--red-text); border: 1px solid var(--red-bd); }
+.sl-high     { background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-bd); }
+.sl-medium   { background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+.sl-low      { background: var(--green-bg); color: var(--green-text); border: 1px solid var(--green-bd); }
+
+.alert-ts { font-family: var(--mono); font-size: 9px; color: var(--ink-400); }
+
+.alert-name-row {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-100);
+  line-height: 1.3;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.alert-src-row { font-family: var(--mono); font-size: 9px; color: var(--ink-400); }
+
+.score-strip {
+  height: 2px;
+  border-radius: 1px;
+  margin-top: 6px;
+  background: var(--ink-700);
+  overflow: hidden;
+}
+
+.score-fill { height: 100%; border-radius: 1px; transition: width 0.6s ease; }
+
+.new-pip {
+  display: inline-block;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--red);
+  margin-left: 5px;
+  vertical-align: middle;
+  animation: livepulse 1s infinite;
+}
+
+/* ── CENTER PANEL ── */
+.center-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-right: var(--border);
+  background: var(--ink-950);
+}
+
+/* Alert header */
+.alert-header {
+  padding: 14px 20px;
+  border-bottom: var(--border);
+  background: var(--ink-900);
+  flex-shrink: 0;
+  display: none;
+}
+
+.alert-header.visible { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+
+.ah-left { flex: 1; min-width: 0; }
+
+.ah-title {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ah-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.meta-chip {
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-400);
+  background: var(--ink-800);
+  padding: 2px 7px;
+  border-radius: 3px;
+  border: var(--border);
+}
+
+.ah-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 13px;
+  border-radius: var(--radius-md);
+  font-family: var(--mono);
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.12s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.btn svg { width: 12px; height: 12px; }
+.btn-ghost  { background: transparent; border-color: var(--ink-600); color: var(--ink-300); }
+.btn-ghost:hover { background: var(--ink-800); color: var(--ink-100); }
+.btn-danger { background: var(--red-bg); border-color: var(--red-bd); color: var(--red-text); }
+.btn-danger:hover { background: rgba(239,68,68,0.18); }
+.btn-primary { background: var(--accent-bg); border-color: var(--accent-bd); color: var(--accent); }
+.btn-primary:hover { background: rgba(59,130,246,0.18); }
+.btn-amber { background: var(--amber-bg); border-color: var(--amber-bd); color: var(--amber-text); }
+.btn-amber:hover { background: rgba(245,158,11,0.18); }
+
+/* Tab bar */
+.tab-bar {
+  display: flex;
+  border-bottom: var(--border);
+  background: var(--ink-900);
+  padding: 0 20px;
+  flex-shrink: 0;
+  gap: 0;
+  display: none;
+}
+
+.tab-bar.visible { display: flex; }
+
+.tab-btn {
+  padding: 10px 16px;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  color: var(--ink-400);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: all 0.12s;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.tab-btn:hover { color: var(--ink-200); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* Tab content */
+.tab-pane { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: none; }
+.tab-pane.active { display: block; }
+
+/* Empty state */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  flex: 1;
+  display: none;
+}
+
+.empty-state.visible { display: flex; }
+
+.empty-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  background: var(--ink-800);
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon svg { width: 22px; height: 22px; color: var(--ink-500); }
+.empty-label { font-family: var(--mono); font-size: 10px; color: var(--ink-500); letter-spacing: 2px; }
+
+/* ── OVERVIEW CONTENT ── */
+.section-label {
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--ink-500);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* Risk banner */
+.risk-banner {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: var(--border);
+  background: var(--ink-900);
+  margin-bottom: 16px;
+}
+
+.risk-gauge {
+  flex-shrink: 0;
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+.risk-gauge svg { transform: rotate(-90deg); }
+
+.risk-gauge-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.risk-num {
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.risk-lbl { font-family: var(--mono); font-size: 7px; color: var(--ink-400); letter-spacing: 1px; }
+
+.risk-info { flex: 1; }
+.risk-title { font-family: var(--display); font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.risk-detail { font-size: 11px; color: var(--ink-300); line-height: 1.5; }
+
+/* AI analysis card */
+.ai-card {
+  border-radius: var(--radius-lg);
+  border: var(--border-hi);
+  background: var(--ink-900);
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.ai-card-top-line {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+}
+
+.ai-card-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.ai-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--accent);
+  animation: livepulse 1.5s infinite;
+}
+
+.ai-card-title { font-family: var(--mono); font-size: 9px; color: var(--accent); letter-spacing: 2px; }
+
+.ai-text {
+  font-size: 12px;
+  line-height: 1.75;
+  color: var(--ink-200);
+  min-height: 56px;
+}
+
+.ai-text.loading::after { content: '▋'; animation: blink-cur 0.7s infinite; color: var(--accent); }
+
+@keyframes blink-cur { 0%,100%{opacity:1}50%{opacity:0} }
+
+/* MITRE tags */
+.mitre-wrap { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 16px; }
+
+.mitre-pill {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  background: var(--purple-bg);
+  border: 1px solid var(--purple-bd);
+  color: var(--purple);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.mitre-pill:hover { background: rgba(139,92,246,0.18); }
+
+/* Detail grid */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.detail-cell {
+  background: var(--ink-900);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+}
+
+.dc-label { font-family: var(--mono); font-size: 9px; color: var(--ink-400); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.dc-value { font-family: var(--mono); font-size: 11px; color: var(--ink-100); word-break: break-all; }
+.dc-red    { color: var(--red-text); }
+.dc-green  { color: var(--green-text); }
+.dc-amber  { color: var(--amber-text); }
+
+/* Triage score banner */
+.triage-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: var(--ink-900);
+  border: var(--border);
+  margin-bottom: 14px;
+}
+
+.ts-num {
+  font-family: var(--display);
+  font-size: 28px;
+  font-weight: 700;
+  flex-shrink: 0;
+  min-width: 52px;
+}
+
+.ts-bars { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+
+.ts-bar-row { display: flex; align-items: center; gap: 8px; }
+.ts-bar-lbl { font-family: var(--mono); font-size: 8px; color: var(--ink-400); min-width: 110px; }
+.ts-bar-track { flex: 1; height: 3px; background: var(--ink-700); border-radius: 2px; overflow: hidden; }
+.ts-bar-fill { height: 100%; border-radius: 2px; }
+.ts-bar-val { font-family: var(--mono); font-size: 8px; color: var(--ink-400); min-width: 24px; text-align: right; }
+
+/* Timeline */
+.timeline { display: flex; flex-direction: column; }
+.tl-item { display: flex; gap: 12px; padding: 8px 0 8px 14px; border-left: 1px solid var(--ink-700); position: relative; }
+.tl-item::before { content: ''; position: absolute; left: -4px; top: 14px; width: 7px; height: 7px; border-radius: 50%; background: var(--ink-600); border: 1px solid var(--ink-950); }
+.tl-item.tl-critical::before { background: var(--red); }
+.tl-item.tl-warning::before  { background: var(--amber); }
+.tl-item.tl-info::before     { background: var(--accent); }
+.tl-time { font-family: var(--mono); font-size: 9px; color: var(--ink-400); min-width: 70px; padding-top: 1px; }
+.tl-event { font-size: 12px; font-weight: 500; color: var(--ink-100); margin-bottom: 2px; }
+.tl-detail { font-family: var(--mono); font-size: 9px; color: var(--ink-400); }
+
+/* Raw log */
+.raw-log-box {
+  background: var(--ink-900);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--green-text);
+  line-height: 1.9;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+/* Threat intel tab */
+.intel-card {
+  background: var(--ink-900);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  position: relative;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.intel-card:hover { border-color: var(--ink-600); }
+.intel-card.loading-card::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg,transparent,var(--accent),transparent); background-size: 200%; animation: scan-line 1.2s infinite; }
+@keyframes scan-line { 0%{background-position:-200%}100%{background-position:200%} }
+
+.ic-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.ic-indicator { font-family: var(--mono); font-size: 11px; color: var(--ink-100); word-break: break-all; }
+.ic-type-badge { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border-radius: 3px; background: var(--ink-800); color: var(--ink-300); border: var(--border); }
+.verdict-row { display: flex; align-items: center; gap: 8px; }
+.verd-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.vd-malicious { background: var(--red); }
+.vd-suspicious { background: var(--amber); }
+.vd-clean { background: var(--green); }
+.vd-unknown { background: var(--ink-500); }
+.verd-label { font-size: 12px; font-weight: 500; }
+.vl-malicious { color: var(--red-text); }
+.vl-suspicious { color: var(--amber-text); }
+.vl-clean { color: var(--green-text); }
+.ic-stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 7px; }
+.ic-stat { font-family: var(--mono); font-size: 9px; color: var(--ink-400); }
+.ic-stat span { color: var(--ink-200); }
+.ic-tags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+.ic-tag { font-family: var(--mono); font-size: 8px; padding: 1px 6px; border-radius: 3px; background: var(--purple-bg); color: var(--purple); border: 1px solid var(--purple-bd); }
+.ic-summary { font-size: 11px; color: var(--ink-300); line-height: 1.6; margin-top: 7px; }
+
+/* Chat */
+.chat-area { display: flex; flex-direction: column; height: 100%; min-height: 0; }
+.chat-msgs { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; margin-bottom: 12px; }
+.chat-bubble { padding: 8px 12px; border-radius: var(--radius-md); font-size: 12px; line-height: 1.6; max-width: 90%; }
+.bubble-user { background: var(--accent-bg); border: 1px solid var(--accent-bd); color: var(--accent); font-family: var(--mono); align-self: flex-end; }
+.bubble-ai { background: var(--ink-900); border: var(--border); color: var(--ink-200); align-self: flex-start; }
+.chat-form { display: flex; gap: 7px; flex-shrink: 0; }
+.chat-textarea {
+  flex: 1;
+  background: var(--ink-900);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 9px 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-100);
+  outline: none;
+  resize: none;
+  height: 38px;
+  transition: border-color 0.12s;
+}
+.chat-textarea:focus { border-color: var(--accent-bd); }
+.chat-textarea::placeholder { color: var(--ink-500); }
+.chat-send {
+  width: 38px; height: 38px;
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-bd);
+  border-radius: var(--radius-md);
+  color: var(--accent);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.12s;
+}
+.chat-send:hover { background: rgba(59,130,246,0.18); }
+.chat-send:disabled { opacity: 0.4; cursor: not-allowed; }
+.chat-send svg { width: 14px; height: 14px; }
+
+/* Bottom chat bar */
+.chat-bar-wrap {
+  padding: 12px 20px;
+  border-top: var(--border);
+  background: var(--ink-900);
+  flex-shrink: 0;
+  display: none;
+}
+
+.chat-bar-wrap.visible { display: block; }
+.chat-bar-label { font-family: var(--mono); font-size: 8px; letter-spacing: 2px; color: var(--ink-500); margin-bottom: 7px; text-transform: uppercase; }
+
+/* ── RIGHT PANEL ── */
+.right-panel {
+  background: var(--ink-900);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.ioc-scroll-wrap {
+  flex: 0 0 auto;
+  max-height: 38%;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.ioc-list { display: flex; flex-direction: column; gap: 5px; padding: 8px; }
+
+.ioc-row {
+  background: var(--ink-800);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  transition: border-color 0.12s;
+}
+
+.ioc-row:hover { border-color: var(--ink-600); }
+
+.ioc-top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px; }
+.ioc-type-lbl { font-family: var(--mono); font-size: 8px; }
+.ioc-score-lbl { font-family: var(--mono); font-size: 9px; }
+.ioc-val { font-family: var(--mono); font-size: 10px; color: var(--ink-100); word-break: break-all; margin-bottom: 2px; }
+.ioc-detail { font-size: 10px; color: var(--ink-400); }
+
+.panel-section-div {
+  padding: 8px 14px 6px;
+  font-family: var(--mono);
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--ink-500);
+  border-top: var(--border);
+  border-bottom: var(--border);
+  background: var(--ink-800);
+  flex-shrink: 0;
+  text-transform: uppercase;
+}
+
+.playbook-list { padding: 8px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; flex: 1; }
+
+.pb-step {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+  padding: 7px 9px;
+  border-radius: var(--radius-md);
+  border: var(--border);
+  background: var(--ink-800);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+
+.pb-step:hover { border-color: var(--ink-600); }
+.pb-step.done { opacity: 0.45; }
+.pb-step.done .pb-num { background: var(--green); color: #000; border-color: var(--green); }
+.pb-step.pb-active { border-color: var(--accent-bd); background: var(--accent-bg); }
+
+.pb-num {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--ink-700);
+  border: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-400);
+  flex-shrink: 0;
+  font-weight: 500;
+}
+
+.pb-text { font-size: 11px; color: var(--ink-200); line-height: 1.4; }
+
+/* ── FLYOUT PANELS ── */
+.flyout {
+  position: fixed;
+  top: 52px;
+  right: 0;
+  bottom: 0;
+  background: var(--ink-900);
+  border-left: var(--border-hi);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
+
+.flyout.open { transform: translateX(0); }
+.flyout-siem  { width: 400px; }
+.flyout-intel { width: 440px; }
+
+.flyout-head {
+  padding: 14px 18px;
+  border-bottom: var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.flyout-title { font-family: var(--display); font-size: 13px; font-weight: 600; color: #fff; }
+.flyout-body { flex: 1; overflow-y: auto; padding: 16px 18px; }
+
+/* Triage full-screen */
+.triage-overlay {
+  position: fixed;
+  inset: 52px 0 0;
+  background: var(--ink-950);
+  z-index: 250;
+  display: none;
+  flex-direction: column;
+}
+
+.triage-overlay.open { display: flex; }
+
+.triage-topbar {
+  padding: 14px 24px;
+  border-bottom: var(--border);
+  background: var(--ink-900);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.triage-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 12px;
+  align-content: start;
+}
+
+.triage-card {
+  background: var(--ink-900);
+  border: var(--border);
+  border-radius: var(--radius-lg);
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+
+.triage-card:hover { border-color: var(--ink-600); transform: translateY(-1px); }
+
+.tc-left-accent {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 3px;
+}
+
+.tca-critical { background: var(--red); }
+.tca-high     { background: var(--amber); }
+.tca-medium   { background: var(--purple); }
+.tca-low      { background: var(--green); }
+
+.tc-inner { padding-left: 12px; }
+.tc-top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.tc-score-block { display: flex; flex-direction: column; }
+.tc-score-n { font-family: var(--display); font-size: 32px; font-weight: 700; line-height: 1; }
+.tc-score-l { font-family: var(--mono); font-size: 8px; color: var(--ink-400); letter-spacing: 1px; }
+.tc-rank-badge { font-family: var(--mono); font-size: 9px; padding: 2px 8px; border-radius: 3px; background: var(--ink-800); color: var(--ink-400); border: var(--border); }
+.tc-name { font-size: 13px; font-weight: 500; color: var(--ink-100); margin-bottom: 3px; }
+.tc-meta { font-family: var(--mono); font-size: 9px; color: var(--ink-400); margin-bottom: 10px; }
+.tc-factor-grid { display: flex; flex-direction: column; gap: 4px; }
+.tc-f-row { display: flex; align-items: center; gap: 7px; }
+.tc-f-lbl { font-family: var(--mono); font-size: 8px; color: var(--ink-400); min-width: 100px; }
+.tc-f-track { flex: 1; height: 3px; background: var(--ink-700); border-radius: 2px; overflow: hidden; }
+.tc-f-fill { height: 100%; border-radius: 2px; }
+.tc-f-val { font-family: var(--mono); font-size: 8px; color: var(--ink-400); min-width: 22px; text-align: right; }
+.tc-label-row { margin-top: 10px; padding-top: 8px; border-top: var(--border); font-size: 11px; color: var(--ink-400); }
+
+/* Form elements */
+.form-group { margin-bottom: 12px; }
+.form-lbl { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: 1px; color: var(--ink-400); text-transform: uppercase; margin-bottom: 5px; }
+.form-input {
+  width: 100%;
+  background: var(--ink-800);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 7px 10px;
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-100);
+  outline: none;
+  transition: border-color 0.12s;
+}
+.form-input:focus { border-color: var(--accent-bd); }
+.form-input::placeholder { color: var(--ink-500); }
+select.form-input option { background: var(--ink-800); }
+
+/* SIEM source card */
+.siem-src-card {
+  background: var(--ink-800);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.siem-src-card.connected { border-color: var(--green-bd); }
+.siem-src-name { font-size: 12px; font-weight: 500; color: var(--ink-100); }
+.siem-src-url { font-family: var(--mono); font-size: 9px; color: var(--ink-400); margin-top: 2px; }
+.siem-src-status { display: flex; align-items: center; gap: 5px; font-family: var(--mono); font-size: 9px; }
+
+/* Feed */
+.feed-list { display: flex; flex-direction: column; gap: 5px; max-height: 220px; overflow-y: auto; }
+.feed-item { background: var(--ink-800); border: var(--border); border-left: 2px solid var(--accent); border-radius: var(--radius-md); padding: 7px 10px; }
+.feed-item.feed-critical { border-left-color: var(--red); }
+.feed-item.feed-high     { border-left-color: var(--amber); }
+.feed-time { font-family: var(--mono); font-size: 8px; color: var(--ink-400); margin-bottom: 2px; }
+.feed-text { font-size: 11px; color: var(--ink-100); }
+.feed-src  { font-family: var(--mono); font-size: 9px; color: var(--ink-400); }
+
+.divider-label { font-family: var(--mono); font-size: 9px; color: var(--ink-500); letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 0 8px; border-top: var(--border); margin-top: 14px; }
+
+.payload-box {
+  background: var(--ink-800);
+  border: var(--border);
+  border-radius: var(--radius-md);
+  padding: 10px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--green-text);
+  line-height: 1.8;
+  white-space: pre;
+}
+
+/* Spinner */
+.spin {
+  display: inline-block;
+  width: 10px; height: 10px;
+  border: 1.5px solid var(--ink-600);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin360 0.6s linear infinite;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+@keyframes spin360 { to { transform: rotate(360deg); } }
+
+/* Placeholder empty */
+.sidebar-placeholder {
+  padding: 20px 14px;
+  font-family: var(--mono);
+  font-size: 9px;
+  color: var(--ink-500);
+  text-align: center;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<!-- ══ TOP NAV ══ -->
+<nav class="topnav">
+  <div class="brand">
+    <div class="brand-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+    </div>
+    <div class="brand-name">SENTINEL</div>
+    <div class="brand-ver">v3.0 ENTERPRISE</div>
+  </div>
+
+  <div style="width:1px;height:20px;background:var(--ink-700);margin:0 8px"></div>
+
+  <button class="nav-pill active" id="npill-soc">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+    Alert Console
+  </button>
+  <button class="nav-pill" onclick="toggleSIEM()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+    SIEM
+  </button>
+  <button class="nav-pill" onclick="toggleIntel()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    Threat Intel
+  </button>
+  <button class="nav-pill" onclick="openTriage()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M7 12h10M10 18h4"/></svg>
+    Triage Engine
+  </button>
+
+  <div class="nav-right">
+    <div class="threat-badge">
+      <span style="width:5px;height:5px;border-radius:50%;background:var(--amber);display:inline-block"></span>
+      ELEVATED
+    </div>
+    <div style="width:1px;height:20px;background:var(--ink-700)"></div>
+    <div style="display:flex;align-items:center;gap:5px">
+      <div class="live-dot"></div>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--green)">LIVE</span>
+    </div>
+    <div class="clock-display" id="clock">00:00:00 EST</div>
+    <div id="siem-badge" style="display:none;font-family:var(--mono);font-size:9px;padding:3px 8px;border-radius:3px;background:var(--green-bg);color:var(--green-text);border:1px solid var(--green-bd)">● SIEM CONNECTED</div>
+  </div>
+</nav>
+
+<!-- ══ METRIC BAR ══ -->
+<div class="metric-bar">
+  <div class="metric-cell">
+    <div class="metric-label">Critical</div>
+    <div class="metric-val mv-red">2</div>
+    <div class="metric-delta">↑1 from 1h ago</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-label">High</div>
+    <div class="metric-val mv-amber">4</div>
+    <div class="metric-delta">↑2 from 1h ago</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-label">Mean TTR</div>
+    <div class="metric-val mv-blue">14m</div>
+    <div class="metric-delta">↓3m improved</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-label">Closed Today</div>
+    <div class="metric-val mv-green">47</div>
+    <div class="metric-delta">↑12 vs yesterday</div>
+  </div>
+  <div class="metric-cell">
+    <div class="metric-label">False Positive</div>
+    <div class="metric-val mv-purple">18%</div>
+    <div class="metric-delta">Industry avg 45%</div>
+  </div>
+</div>
+
+<!-- ══ WORKSPACE ══ -->
+<div class="workspace">
+
+  <!-- LEFT: Alert Queue -->
+  <div class="left-panel">
+    <div class="panel-head">
+      <span class="panel-head-title">Alert Queue</span>
+      <span class="count-badge cb-red" id="alert-count">6 active</span>
+    </div>
+    <div class="alert-queue" id="alert-queue"></div>
+  </div>
+
+  <!-- CENTER: Investigation -->
+  <div class="center-panel">
+
+    <!-- Empty state -->
+    <div class="empty-state visible" id="empty-state">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+      </div>
+      <div class="empty-label">Select an alert to investigate</div>
+    </div>
+
+    <!-- Alert header -->
+    <div class="alert-header" id="alert-header">
+      <div class="ah-left">
+        <div class="ah-title" id="ah-title">—</div>
+        <div class="ah-meta" id="ah-meta"></div>
+      </div>
+      <div class="ah-actions">
+        <button class="btn btn-ghost" onclick="dismissAlert()">Dismiss</button>
+        <button class="btn btn-amber" onclick="escalateAlert()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 15l7-7 7 7"/></svg>
+          Escalate
+        </button>
+        <button class="btn btn-danger" onclick="closeAlert()">Close</button>
+      </div>
+    </div>
+
+    <!-- Tab bar -->
+    <div class="tab-bar" id="tab-bar">
+      <div class="tab-btn active" onclick="switchTab('overview')">Overview</div>
+      <div class="tab-btn" onclick="switchTab('intel')">Threat Intel</div>
+      <div class="tab-btn" onclick="switchTab('timeline')">Timeline</div>
+      <div class="tab-btn" onclick="switchTab('raw')">Raw Log</div>
+      <div class="tab-btn" onclick="switchTab('chat')">AI Chat</div>
+    </div>
+
+    <!-- Overview -->
+    <div class="tab-pane active" id="tab-overview">
+      <div id="ov-triage-row" style="display:none"></div>
+      <div class="ai-card">
+        <div class="ai-card-top-line"></div>
+        <div class="ai-card-label">
+          <div class="ai-dot"></div>
+          <span class="ai-card-title">AI Triage Analysis</span>
+        </div>
+        <div class="ai-text loading" id="ai-text">Select an alert to begin analysis.</div>
+      </div>
+      <div id="ov-risk" style="display:none"></div>
+      <div class="section-label">MITRE ATT&CK</div>
+      <div class="mitre-wrap" id="ov-mitre"></div>
+      <div class="section-label">Alert Details</div>
+      <div class="detail-grid" id="ov-details"></div>
+    </div>
+
+    <!-- Threat Intel -->
+    <div class="tab-pane" id="tab-intel">
+      <div id="intel-tab-content">
+        <div class="sidebar-placeholder" style="padding:40px">Select an alert to run threat intel lookups</div>
+      </div>
+    </div>
+
+    <!-- Timeline -->
+    <div class="tab-pane" id="tab-timeline">
+      <div class="timeline" id="timeline-list"></div>
+    </div>
+
+    <!-- Raw Log -->
+    <div class="tab-pane" id="tab-raw">
+      <div class="raw-log-box" id="raw-log-box">—</div>
+    </div>
+
+    <!-- Chat -->
+    <div class="tab-pane" id="tab-chat">
+      <div class="chat-area">
+        <div class="chat-msgs" id="chat-msgs"></div>
+      </div>
+    </div>
+
+    <!-- Chat bar (bottom) -->
+    <div class="chat-bar-wrap" id="chat-bar-wrap">
+      <div class="chat-bar-label">Ask AI Analyst</div>
+      <div class="chat-form">
+        <textarea class="chat-textarea" id="chat-input" placeholder="Ask about this alert — blast radius, false positive check, containment steps…" onkeydown="handleKey(event)"></textarea>
+        <button class="chat-send" id="chat-send" onclick="sendChat()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: IOCs + Playbook -->
+  <div class="right-panel">
+    <div class="panel-head">
+      <span class="panel-head-title">Indicators</span>
+      <span class="count-badge cb-red" id="ioc-count">0</span>
+    </div>
+    <div class="ioc-scroll-wrap">
+      <div id="ioc-list"><div class="sidebar-placeholder">Select an alert</div></div>
+    </div>
+    <div class="panel-section-div">Response Playbook</div>
+    <div class="panel-head" style="flex-shrink:0">
+      <span class="panel-head-title">Steps</span>
+      <span class="count-badge cb-blue" id="pb-progress">0/0</span>
+    </div>
+    <div class="playbook-list" id="pb-list">
+      <div class="sidebar-placeholder">Select an alert</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SIEM FLYOUT ══ -->
+<div class="flyout flyout-siem" id="flyout-siem">
+  <div class="flyout-head">
+    <div class="flyout-title">SIEM Integration</div>
+    <button class="btn btn-ghost" onclick="toggleSIEM()" style="padding:4px 10px">✕</button>
+  </div>
+  <div class="flyout-body">
+    <div class="form-lbl" style="margin-bottom:8px">Connected Sources</div>
+    <div id="siem-src-list"><div class="sidebar-placeholder" style="padding:14px;text-align:left">No sources connected</div></div>
+
+    <div class="divider-label">Add Source</div>
+    <div class="form-group">
+      <label class="form-lbl">SIEM Type</label>
+      <select class="form-input" id="siem-type">
+        <option value="splunk">Splunk Enterprise / Cloud</option>
+        <option value="elastic">Elastic SIEM</option>
+        <option value="sentinel">Microsoft Sentinel</option>
+        <option value="qradar">IBM QRadar</option>
+        <option value="chronicle">Google Chronicle</option>
+        <option value="webhook">Generic Webhook (JSON)</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Webhook URL</label>
+      <input class="form-input" id="siem-url" type="text" placeholder="https://siem.corp/api/alerts/webhook">
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">API Key / Token</label>
+      <input class="form-input" id="siem-key" type="password" placeholder="Bearer token or API key">
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Display Name</label>
+      <input class="form-input" id="siem-name" type="text" placeholder="e.g. Prod Splunk — SOC">
+    </div>
+    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-bottom:16px" onclick="addSIEM()">Connect Source</button>
+
+    <div class="divider-label">Live Alert Feed</div>
+    <div class="feed-list" id="siem-feed"><div class="sidebar-placeholder" style="padding:12px;text-align:left;font-size:9px">Connect a source to see live alerts</div></div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-top:8px;margin-bottom:14px" onclick="simulateFeed()">▶ Simulate Live Feed</button>
+
+    <div class="divider-label">Webhook Payload Schema</div>
+    <div class="payload-box">{
+  "alert_id": "ALT-XXXX",
+  "name":     "Alert name",
+  "severity": "CRITICAL",
+  "source":   "Splunk",
+  "host":     "hostname",
+  "src_ip":   "1.2.3.4",
+  "user":     "username",
+  "mitre":    ["T1190"],
+  "raw_log":  "..."
+}</div>
+  </div>
+</div>
+
+<!-- ══ INTEL FLYOUT ══ -->
+<div class="flyout flyout-intel" id="flyout-intel">
+  <div class="flyout-head">
+    <div class="flyout-title">Threat Intelligence</div>
+    <button class="btn btn-ghost" onclick="toggleIntel()" style="padding:4px 10px">✕</button>
+  </div>
+  <div class="flyout-body">
+    <div class="form-group">
+      <label class="form-lbl">API Keys (session only)</label>
+      <input class="form-input" id="vt-key" type="password" placeholder="VirusTotal API Key" style="margin-bottom:6px">
+      <input class="form-input" id="abuse-key" type="password" placeholder="AbuseIPDB API Key">
+      <div style="font-family:var(--mono);font-size:8px;color:var(--ink-500);margin-top:4px">Leave blank to use AI-simulated results</div>
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Single Indicator Lookup</label>
+      <div style="display:flex;gap:6px">
+        <input class="form-input" id="intel-q" type="text" placeholder="IP, domain, hash, URL…" style="flex:1">
+        <button class="btn btn-primary" onclick="runSingleLookup()">Lookup</button>
+      </div>
+    </div>
+    <div id="single-intel-result"></div>
+
+    <div class="divider-label">Bulk IOC Lookup — Current Alert</div>
+    <button class="btn btn-ghost" style="width:100%;justify-content:center;margin-bottom:10px" onclick="runBulkLookup()">Run Bulk Lookup</button>
+    <div id="bulk-intel-result"></div>
+  </div>
+</div>
+
+<!-- ══ TRIAGE ENGINE OVERLAY ══ -->
+<div class="triage-overlay" id="triage-overlay">
+  <div class="triage-topbar">
+    <div>
+      <div style="font-family:var(--display);font-size:15px;font-weight:600;color:#fff">Auto-Triage Engine</div>
+      <div style="font-family:var(--mono);font-size:9px;color:var(--ink-400);margin-top:2px">AI-ranked · Multi-factor scoring · Kill chain mapping</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary" onclick="runTriage()"><span class="spin" id="triage-spin" style="display:none"></span>Re-score All</button>
+      <button class="btn btn-ghost" onclick="closeTriage()">✕ Close</button>
+    </div>
+  </div>
+  <div style="background:var(--ink-900);border-bottom:var(--border);padding:8px 24px;flex-shrink:0">
+    <span style="font-family:var(--mono);font-size:9px;color:var(--ink-400)">Scoring factors: <span style="color:var(--ink-200)">Threat Intel · Kill Chain Stage · Asset Criticality · Velocity · IOC Confidence · MITRE Coverage</span></span>
+  </div>
+  <div class="triage-grid" id="triage-grid">
+    <div style="font-family:var(--mono);font-size:9px;color:var(--ink-500);text-align:center;padding:40px;grid-column:1/-1">Click Re-score All to run the triage engine</div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════════════
+const API = 'https://api.anthropic.com/v1/messages';
+let currentAlert = null;
+let chatHistory = [];
+let completedSteps = new Set();
+let isLoading = false;
+let siemSources = [];
+let feedTimer = null;
+let triageScores = {};
+
+// ══════════════════════════════════════════════════
+//  DATA
+// ══════════════════════════════════════════════════
+const ALERTS = [
+  {
+    id:'ALT-001', name:'Credential Stuffing Attack Detected', severity:'CRITICAL',
+    source:'Auth Service / WAF', time:'02:14:33', host:'auth-prod-01.internal',
+    src_ip:'185.220.101.47', dest_ip:'10.0.1.15', user:'admin@company.com', action:'BLOCKED',
+    mitre:['T1110.004','T1078','T1190'],
+    iocs:[
+      {type:'IP',value:'185.220.101.47',verdict:'malicious',score:98,detail:'Tor exit node · 847 reports'},
+      {type:'IP',value:'91.108.4.0/22',verdict:'suspicious',score:67,detail:'AS59930 · Known bad range'},
+      {type:'USER',value:'admin@company.com',verdict:'suspicious',score:45,detail:'12,400 failed logins/hr'},
+    ],
+    risk:92,riskLabel:'Critical Risk',riskDetail:'Active brute-force · Tor exit node · Privileged account targeted',
+    timeline:[
+      {t:'02:14:33',cls:'tl-critical',ev:'Auth service triggered alert',det:'12,400 req/min — threshold exceeded'},
+      {t:'02:14:29',cls:'tl-warning',ev:'WAF rate-limit fired',det:'185.220.101.47 → /api/auth/login'},
+      {t:'02:13:50',cls:'tl-info',ev:'Anomalous login pattern started',det:'User enumeration phase detected'},
+    ],
+    playbook:['Verify alert is not a false positive via SIEM','Block source IP 185.220.101.47 at perimeter','Lock targeted account admin@company.com','Check for successful logins from same IP range','Notify identity team and account owner','Search for credential dumps matching domain'],
+    rawLog:`[2024-05-02T02:14:33Z] CRITICAL auth-prod-01 WAF[8821]: credential_stuffing\nsrc_ip=185.220.101.47 dst_ip=10.0.1.15 port=443\nuser=admin@company.com req_count=12400 window=60s\nrule_id=CS-001 action=BLOCK threat_intel=tor_exit_node\nua="python-requests/2.28.2"`
+  },
+  {
+    id:'ALT-002', name:'Ransomware: Mass File Encryption Active', severity:'CRITICAL',
+    source:'EDR / Endpoint', time:'01:57:12', host:'WKSTN-ACCT-042',
+    src_ip:'10.50.12.42', dest_ip:'N/A', user:'jsmith', action:'CONTAINED',
+    mitre:['T1486','T1490','T1562.001'],
+    iocs:[
+      {type:'HASH',value:'a3f5b2c1d4...e9',verdict:'malicious',score:99,detail:'BlackCat/ALPHV variant'},
+      {type:'PROCESS',value:'svchost32.exe',verdict:'malicious',score:97,detail:'Masquerading svchost'},
+      {type:'DOMAIN',value:'update-kb[.]ru',verdict:'malicious',score:94,detail:'C2 beacon · Newly registered'},
+    ],
+    risk:99,riskLabel:'Critical — Active Ransomware',riskDetail:'Host isolated · 847 files encrypted · Spread risk HIGH',
+    timeline:[
+      {t:'01:57:12',cls:'tl-critical',ev:'EDR isolated host',det:'WKSTN-ACCT-042 network disconnected'},
+      {t:'01:57:08',cls:'tl-critical',ev:'847 files renamed .locked',det:'Z: drive encryption detected'},
+      {t:'01:56:40',cls:'tl-warning',ev:'VSS deletion attempt',det:'vssadmin delete shadows /all /quiet'},
+      {t:'01:54:20',cls:'tl-warning',ev:'svchost32.exe spawned',det:'Parent: WINWORD.EXE — malicious macro'},
+    ],
+    playbook:['Confirm EDR host isolation is active','Identify patient-zero document','Scan network shares for .locked files','Check lateral movement via SMB/RDP','Pull memory dump from isolated host','Notify IR team and legal/compliance','Begin recovery from last-known-good backup'],
+    rawLog:`[2024-05-02T01:57:08Z] CRITICAL WKSTN-ACCT-042 EDR[ransomware]:\nprocess=svchost32.exe pid=9812 parent=WINWORD.EXE\naction=mass_file_rename ext=.locked count=847 path=Z:\\\nc2_attempt=update-kb.ru:443 blocked=yes\nvss_deletion=detected host_isolated=true`
+  },
+  {
+    id:'ALT-003', name:'Lateral Movement via Pass-the-Hash', severity:'HIGH',
+    source:'SIEM / Active Directory', time:'01:44:05', host:'DC-PRIMARY-01',
+    src_ip:'10.50.14.88', dest_ip:'10.0.0.10', user:'CORP\\svc_backup', action:'DETECTED',
+    mitre:['T1550.002','T1021.002','T1078.002'],
+    iocs:[
+      {type:'IP',value:'10.50.14.88',verdict:'suspicious',score:78,detail:'Internal · Unusual auth pattern'},
+      {type:'HASH',value:'NTLM:aad3b435...',verdict:'suspicious',score:82,detail:'Service acct NTLM hash used'},
+      {type:'USER',value:'svc_backup',verdict:'suspicious',score:75,detail:'Service acct used interactively'},
+    ],
+    risk:76,riskLabel:'High — Lateral Movement',riskDetail:'Domain controller targeted · Service account abuse',
+    timeline:[
+      {t:'01:44:05',cls:'tl-critical',ev:'PtH to Domain Controller',det:'svc_backup → DC-PRIMARY-01 via SMB'},
+      {t:'01:43:30',cls:'tl-warning',ev:'NTLM hash extracted',det:'From WKSTN-FIN-022 LSASS dump'},
+      {t:'01:42:00',cls:'tl-warning',ev:'LSASS access detected',det:'Mimikatz-like behavior on FIN-022'},
+    ],
+    playbook:['Disable svc_backup account immediately','Reset NTLM hashes on compromised host','Scan for other PtH attempts','Enable credential guard on workstations','Check DC event logs for successful auth'],
+    rawLog:`[2024-05-02T01:44:05Z] HIGH DC-PRIMARY-01 Security[4624]:\nEventID=4624 LogonType=3 AuthPackage=NTLM\nSubjectUserName=svc_backup WorkstationName=WKSTN-FIN-022\nIpAddress=10.50.14.88 ALERT: Pass-the-Hash detected`
+  },
+  {
+    id:'ALT-004', name:'Data Exfiltration via DNS Tunneling', severity:'HIGH',
+    source:'DNS / NDR', time:'01:22:47', host:'WKSTN-DEV-017',
+    src_ip:'10.50.8.17', dest_ip:'8.8.8.8', user:'developer3', action:'MONITORING',
+    mitre:['T1071.004','T1048','T1041'],
+    iocs:[
+      {type:'DOMAIN',value:'xn--e1a8h.exfil[.]io',verdict:'malicious',score:91,detail:'DNS tunnel · High entropy subdomains'},
+      {type:'IP',value:'104.21.78.55',verdict:'suspicious',score:64,detail:'Cloudflare proxy · New registration'},
+      {type:'PROCESS',value:'python3 -m dnscat',verdict:'malicious',score:96,detail:'Known DNS tunneling tool'},
+    ],
+    risk:73,riskLabel:'High — Data Exfiltration',riskDetail:'~2.3GB exfiltrated via DNS · 6 hours active',
+    timeline:[
+      {t:'01:22:47',cls:'tl-critical',ev:'NDR flagged DNS tunnel',det:'Entropy 7.8/8.0 on subdomains'},
+      {t:'01:22:00',cls:'tl-warning',ev:'Sustained DNS query storm',det:'2,400 queries/min to single resolver'},
+      {t:'19:30:00',cls:'tl-info',ev:'Tunnel first established',det:'python3 process started'},
+    ],
+    playbook:['Block DNS to suspicious domain at resolver','Kill python3 process on DEV-017','Determine what data was exfiltrated','Check git logs for cloned repos','Initiate DLP review on developer3','Preserve forensic image of DEV-017'],
+    rawLog:`[2024-05-02T01:22:47Z] HIGH WKSTN-DEV-017 NDR[dns_tunnel]:\nprocess="python3 -m dnscat2" dns_server=8.8.8.8\ndomain=xn--e1a8h.exfil.io query_rate=2400/min\nbytes_tx=2.3GB entropy_avg=7.8 verdict=MALICIOUS`
+  },
+  {
+    id:'ALT-005', name:'Privilege Escalation via Sudo Abuse', severity:'MEDIUM',
+    source:'Linux Auditd', time:'01:08:19', host:'app-server-03.prod',
+    src_ip:'10.20.1.33', dest_ip:'N/A', user:'appuser', action:'DETECTED',
+    mitre:['T1548.003','T1078'],
+    iocs:[
+      {type:'USER',value:'appuser',verdict:'suspicious',score:60,detail:'Service acct using interactive sudo'},
+      {type:'COMMAND',value:'sudo /bin/bash',verdict:'malicious',score:88,detail:'Root shell via NOPASSWD entry'},
+    ],
+    risk:58,riskLabel:'Medium — Privilege Escalation',riskDetail:'Service account → root · Misconfigured sudoers',
+    timeline:[
+      {t:'01:08:19',cls:'tl-critical',ev:'Root shell obtained',det:'sudo /bin/bash succeeded'},
+      {t:'01:08:10',cls:'tl-warning',ev:'SSH login from unusual IP',det:'appuser from 10.20.1.33'},
+    ],
+    playbook:['Review and fix sudoers misconfiguration','Audit commands run as root','Check if SSH key was compromised','Rotate appuser credentials'],
+    rawLog:`[2024-05-02T01:08:19Z] MEDIUM app-server-03 auditd[sudo]:\nexe="/usr/bin/sudo" cmd="/bin/bash" acct="appuser"\nres=success ALERT: NOPASSWD sudo to root shell`
+  },
+  {
+    id:'ALT-006', name:'Cloud: Public S3 Bucket with PII Detected', severity:'MEDIUM',
+    source:'CSPM / AWS', time:'00:51:03', host:'s3://prod-customer-data',
+    src_ip:'0.0.0.0/0', dest_ip:'AWS S3', user:'IAM:terraform-role', action:'DETECTED',
+    mitre:['T1530','T1537'],
+    iocs:[
+      {type:'BUCKET',value:'prod-customer-data',verdict:'suspicious',score:70,detail:'Public ACL · PII detected inside'},
+      {type:'IAM',value:'terraform-role',verdict:'suspicious',score:55,detail:'Misconfigured policy applied'},
+    ],
+    risk:65,riskLabel:'Medium — Data Exposure',riskDetail:'S3 bucket publicly accessible · PII detected · 14k objects',
+    timeline:[
+      {t:'00:51:03',cls:'tl-critical',ev:'CSPM flagged public bucket',det:'prod-customer-data ACL=public-read'},
+      {t:'00:50:40',cls:'tl-warning',ev:'Terraform apply detected',det:'ACL changed by terraform-role'},
+    ],
+    playbook:['Revoke public ACL on S3 bucket immediately','Enable bucket versioning and logging','Audit CloudTrail for external access','Notify DPO for potential breach','Review Terraform IaC for misconfiguration patterns'],
+    rawLog:`[2024-05-02T00:51:03Z] MEDIUM CSPM s3[public_exposure]:\nbucket=prod-customer-data acl=public-read\npii_detected=true objects=14200 size_gb=2.1\nchanged_by=arn:aws:iam::123456789:role/terraform-role`
+  }
+];
+
+// ══════════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════════
+function sevSS(s){ return s==='CRITICAL'?'ss-critical':s==='HIGH'?'ss-high':s==='MEDIUM'?'ss-medium':'ss-low'; }
+function sevSL(s){ return s==='CRITICAL'?'sl-critical':s==='HIGH'?'sl-high':s==='MEDIUM'?'sl-medium':'sl-low'; }
+function scoreColor(n){ return n>=80?'var(--red)':n>=60?'var(--amber)':n>=40?'var(--purple)':'var(--green)'; }
+function scoreTextCls(n){ return n>=80?'mv-red':n>=60?'mv-amber':n>=40?'mv-purple':'mv-green'; }
+
+// Clock
+function tick(){
+  const now = new Date();
+  const est = now.toLocaleTimeString('en-US', {
+    timeZone: 'America/New_York',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+  const tz = now.toLocaleDateString('en-US', {timeZone:'America/New_York',timeZoneName:'short'}).split(', ')[1] || 'EST';
+  document.getElementById('clock').textContent = est + ' ' + tz;
+}
+setInterval(tick,1000); tick();
+
+// ══════════════════════════════════════════════════
+//  RENDER ALERT QUEUE
+// ══════════════════════════════════════════════════
+function renderQueue(){
+  const el=document.getElementById('alert-queue');
+  el.innerHTML='';
+  ALERTS.forEach((a,i)=>{
+    const ts=triageScores[a.id];
+    const pct=ts?ts.total:a.risk;
+    const div=document.createElement('div');
+    div.className='alert-row';
+    div.id=`ar-${i}`;
+    div.innerHTML=`
+      <div class="sev-strip ${sevSS(a.severity)}"></div>
+      <div class="alert-body">
+        <div class="alert-row-top">
+          <span class="sev-label ${sevSL(a.severity)}">${a.severity}</span>
+          <span class="alert-ts">${a.time}</span>
+        </div>
+        <div class="alert-name-row">${a.name}${i<2?'<span class="new-pip"></span>':''}</div>
+        <div class="alert-src-row">${a.source}</div>
+        <div class="score-strip"><div class="score-fill" style="width:${pct}%;background:${scoreColor(pct)}"></div></div>
+      </div>`;
+    div.onclick=()=>selectAlert(i);
+    el.appendChild(div);
+  });
+  document.getElementById('alert-count').textContent=`${ALERTS.length} active`;
+}
+
+// ══════════════════════════════════════════════════
+//  SELECT ALERT
+// ══════════════════════════════════════════════════
+function selectAlert(idx){
+  document.querySelectorAll('.alert-row').forEach(e=>e.classList.remove('selected'));
+  document.getElementById(`ar-${idx}`)?.classList.add('selected');
+  currentAlert=ALERTS[idx];
+  chatHistory=[];
+  completedSteps=new Set();
+
+  document.getElementById('empty-state').classList.remove('visible');
+  document.getElementById('alert-header').classList.add('visible');
+  document.getElementById('tab-bar').classList.add('visible');
+  document.getElementById('chat-bar-wrap').classList.add('visible');
+  document.getElementById('chat-msgs').innerHTML='';
+
+  switchTab('overview');
+
+  const a=currentAlert;
+  document.getElementById('ah-title').textContent=a.name;
+  document.getElementById('ah-meta').innerHTML=[
+    `<span class="meta-chip">${a.id}</span>`,
+    `<span class="meta-chip">${a.host}</span>`,
+    `<span class="meta-chip">${a.user}</span>`,
+    `<span class="meta-chip" style="color:${['BLOCKED','CONTAINED'].includes(a.action)?'var(--green-text)':'var(--amber-text)'}">${a.action}</span>`
+  ].join('');
+
+  renderOverview();
+  renderTimeline();
+  renderRaw();
+  renderIOCs();
+  renderPlaybook();
+  renderIntelTab();
+  generateAIAnalysis();
+}
+
+// ══════════════════════════════════════════════════
+//  OVERVIEW
+// ══════════════════════════════════════════════════
+function renderOverview(){
+  const a=currentAlert;
+
+  // Triage score
+  const ts=triageScores[a.id];
+  const trEl=document.getElementById('ov-triage-row');
+  if(ts){
+    trEl.style.display='block';
+    trEl.innerHTML=`<div class="triage-row" style="margin-bottom:16px">
+      <div style="flex-shrink:0">
+        <div class="ts-num ${scoreTextCls(ts.total)}">${ts.total}</div>
+        <div style="font-family:var(--mono);font-size:8px;color:var(--ink-400);letter-spacing:1px">TRIAGE</div>
+      </div>
+      <div class="ts-bars">
+        <div style="font-size:12px;font-weight:500;color:var(--ink-100);margin-bottom:6px">${ts.label||''}</div>
+        ${Object.entries(ts.factors||{}).map(([k,v])=>`
+        <div class="ts-bar-row">
+          <span class="ts-bar-lbl">${k}</span>
+          <div class="ts-bar-track"><div class="ts-bar-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div>
+          <span class="ts-bar-val">${v}</span>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  } else { trEl.style.display='none'; }
+
+  // Risk banner
+  const rvEl=document.getElementById('ov-risk');
+  const circ=2*Math.PI*26;
+  const offset=circ*(1-a.risk/100);
+  const rColor=scoreColor(a.risk);
+  rvEl.style.display='block';
+  rvEl.innerHTML=`<div class="risk-banner" style="border-left:3px solid ${rColor};margin-bottom:16px">
+    <div class="risk-gauge">
+      <svg viewBox="0 0 64 64" width="64" height="64">
+        <circle cx="32" cy="32" r="26" fill="none" stroke="var(--ink-700)" stroke-width="5"/>
+        <circle cx="32" cy="32" r="26" fill="none" stroke="${rColor}" stroke-width="5"
+          stroke-dasharray="${circ}" stroke-dashoffset="${offset}" stroke-linecap="round"/>
+      </svg>
+      <div class="risk-gauge-text">
+        <div class="risk-num" style="color:${rColor}">${a.risk}</div>
+        <div class="risk-lbl">RISK</div>
+      </div>
+    </div>
+    <div class="risk-info">
+      <div class="risk-title">${a.riskLabel}</div>
+      <div class="risk-detail">${a.riskDetail}</div>
+    </div>
+  </div>`;
+
+  // MITRE
+  document.getElementById('ov-mitre').innerHTML=a.mitre.map(m=>`<span class="mitre-pill">${m}</span>`).join('');
+
+  // Details
+  const fields=[
+    {l:'Source IP',v:a.src_ip,c:a.src_ip.match(/^185|^91/)?'dc-red':''},
+    {l:'Destination',v:a.dest_ip||'N/A',c:''},
+    {l:'User Account',v:a.user,c:''},
+    {l:'Alert ID',v:a.id,c:''},
+    {l:'Hostname',v:a.host,c:''},
+    {l:'Action Taken',v:a.action,c:['BLOCKED','CONTAINED'].includes(a.action)?'dc-green':'dc-amber'},
+  ];
+  document.getElementById('ov-details').innerHTML=fields.map(f=>`
+    <div class="detail-cell">
+      <div class="dc-label">${f.l}</div>
+      <div class="dc-value ${f.c}">${f.v}</div>
+    </div>`).join('');
+
+  // Reset AI
+  const aiEl=document.getElementById('ai-text');
+  aiEl.textContent=''; aiEl.classList.add('loading');
+}
+
+// ══════════════════════════════════════════════════
+//  AI ANALYSIS
+// ══════════════════════════════════════════════════
+async function generateAIAnalysis(){
+  const a=currentAlert;
+  const aiEl=document.getElementById('ai-text');
+  const prompt=`You are a Tier 1 SOC Analyst. Analyze this alert in 3-4 sentences.
+Alert: ${a.name} | Severity: ${a.severity} | MITRE: ${a.mitre.join(', ')}
+Host: ${a.host} | IP: ${a.src_ip} | User: ${a.user} | Action: ${a.action} | Risk: ${a.risk}/100
+Provide: 1) What is happening, 2) Likely intent, 3) Immediate recommended action. Be direct and technical.`;
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    aiEl.classList.remove('loading');
+    typeText(aiEl,d.content?.[0]?.text||'Analysis unavailable.');
+  }catch(e){
+    aiEl.classList.remove('loading');
+    aiEl.textContent='AI analysis unavailable — check Anthropic API connectivity.';
+  }
+}
+
+function typeText(el,txt){
+  let i=0; el.textContent='';
+  const iv=setInterval(()=>{ el.textContent+=txt[i++]; if(i>=txt.length)clearInterval(iv); },11);
+}
+
+// ══════════════════════════════════════════════════
+//  THREAT INTEL TAB
+// ══════════════════════════════════════════════════
+function renderIntelTab(){
+  if(!currentAlert)return;
+  const el=document.getElementById('intel-tab-content');
+  el.innerHTML=`
+    <div class="section-label" style="margin-bottom:10px">IOC Threat Intelligence — Click to Lookup</div>
+    <div id="inline-ioc-cards" style="display:flex;flex-direction:column;gap:8px"></div>`;
+  const cards=document.getElementById('inline-ioc-cards');
+  cards.innerHTML=currentAlert.iocs.map((ioc,i)=>`
+    <div class="intel-card" id="iic-${i}">
+      <div class="ic-top">
+        <span class="ic-type-badge">${ioc.type}</span>
+        <button class="btn btn-ghost" style="padding:3px 10px;font-size:9px" onclick="lookupIOC(${i})">Lookup</button>
+      </div>
+      <div class="ic-indicator">${ioc.value}</div>
+      <div id="iic-r-${i}" style="font-family:var(--mono);font-size:9px;color:var(--ink-500);margin-top:6px">Click Lookup to query threat intel</div>
+    </div>`).join('');
+}
+
+async function lookupIOC(idx){
+  const ioc=currentAlert.iocs[idx];
+  const card=document.getElementById(`iic-${idx}`);
+  const res=document.getElementById(`iic-r-${idx}`);
+  card.classList.add('loading-card');
+  res.innerHTML=`<span class="spin"></span>Querying intelligence sources…`;
+  const prompt=`Analyze IOC: type="${ioc.type}" value="${ioc.value}" context="${currentAlert.name}"
+Return ONLY JSON (no markdown): {"verdict":"malicious|suspicious|clean|unknown","confidence":0-100,"threat_score":0-100,"malicious_reports":number,"total_scanners":number,"tags":[],"threat_families":[],"first_seen":"date","last_seen":"date","geo":"country if IP","asn":"asn if IP","summary":"2 technical sentences"}`;
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    let txt=d.content?.[0]?.text||'{}';
+    txt=txt.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(txt);
+    card.classList.remove('loading-card');
+    res.innerHTML=buildIntelHTML(p);
+  }catch(e){
+    card.classList.remove('loading-card');
+    res.innerHTML=`<span style="color:var(--red-text);font-family:var(--mono);font-size:9px">Lookup failed: ${e.message}</span>`;
+  }
+}
+
+function buildIntelHTML(p){
+  const vc=p.verdict==='malicious'?'vd-malicious':p.verdict==='suspicious'?'vd-suspicious':p.verdict==='clean'?'vd-clean':'vd-unknown';
+  const vl=p.verdict==='malicious'?'vl-malicious':p.verdict==='suspicious'?'vl-suspicious':p.verdict==='clean'?'vl-clean':'';
+  return `<div style="margin-top:8px">
+    <div class="verdict-row" style="margin-bottom:7px">
+      <div class="verd-dot ${vc}"></div>
+      <span class="verd-label ${vl}">${(p.verdict||'unknown').toUpperCase()}</span>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--ink-400)">Score: <span style="color:var(--ink-200)">${p.threat_score||0}/100</span></span>
+      <span style="font-family:var(--mono);font-size:9px;color:var(--ink-400)">Confidence: ${p.confidence||0}%</span>
+    </div>
+    <div class="ic-stats">
+      ${p.malicious_reports!==undefined?`<span class="ic-stat">Detections: <span style="color:var(--red-text)">${p.malicious_reports}/${p.total_scanners}</span></span>`:''}
+      ${p.geo?`<span class="ic-stat">Geo: <span>${p.geo}</span></span>`:''}
+      ${p.asn?`<span class="ic-stat">ASN: <span>${p.asn}</span></span>`:''}
+      ${p.first_seen?`<span class="ic-stat">First seen: <span>${p.first_seen}</span></span>`:''}
+    </div>
+    ${p.tags?.length?`<div class="ic-tags">${p.tags.map(t=>`<span class="ic-tag">${t}</span>`).join('')}</div>`:''}
+    ${p.threat_families?.length?`<div style="font-family:var(--mono);font-size:9px;color:var(--amber-text);margin-top:6px">Families: ${p.threat_families.join(', ')}</div>`:''}
+    ${p.summary?`<div class="ic-summary">${p.summary}</div>`:''}
+  </div>`;
+}
+
+// ══════════════════════════════════════════════════
+//  FLYOUT INTEL PANEL
+// ══════════════════════════════════════════════════
+function toggleIntel(){
+  document.getElementById('flyout-intel').classList.toggle('open');
+  document.getElementById('flyout-siem').classList.remove('open');
+}
+
+async function runSingleLookup(){
+  const q=document.getElementById('intel-q').value.trim();
+  if(!q)return;
+  const el=document.getElementById('single-intel-result');
+  el.innerHTML=`<div class="intel-card loading-card"><div class="ic-indicator" style="margin-bottom:8px">${q}</div><div style="font-family:var(--mono);font-size:9px;color:var(--ink-400)"><span class="spin"></span>Running lookup…</div></div>`;
+  const prompt=`Analyze indicator: "${q}". Return ONLY JSON: {"verdict":"malicious|suspicious|clean|unknown","confidence":0-100,"threat_score":0-100,"malicious_reports":number,"total_scanners":number,"tags":[],"threat_families":[],"first_seen":"date","last_seen":"date","geo":"if IP","asn":"if IP","summary":"2 sentences"}`;
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    let txt=d.content?.[0]?.text||'{}'; txt=txt.replace(/```json|```/g,'').trim();
+    const p=JSON.parse(txt);
+    el.innerHTML=`<div class="intel-card"><div class="ic-top"><span class="ic-indicator">${q}</span><span class="ic-type-badge">AI SIM</span></div>${buildIntelHTML(p)}</div>`;
+  }catch(e){ el.innerHTML=`<span style="color:var(--red-text);font-family:var(--mono);font-size:9px">Lookup failed: ${e.message}</span>`; }
+}
+
+async function runBulkLookup(){
+  if(!currentAlert){ document.getElementById('bulk-intel-result').innerHTML='<span style="font-family:var(--mono);font-size:9px;color:var(--amber-text)">Select an alert first</span>'; return; }
+  const el=document.getElementById('bulk-intel-result');
+  el.innerHTML=`<div style="font-family:var(--mono);font-size:9px;color:var(--ink-400)"><span class="spin"></span>Running bulk lookup…</div>`;
+  const results=[];
+  for(const ioc of currentAlert.iocs){
+    const p2=`Analyze IOC "${ioc.value}" (${ioc.type}) in context "${currentAlert.name}". Return ONLY JSON: {"verdict":"malicious|suspicious|clean","threat_score":0-100,"summary":"one sentence"}`;
+    try{
+      const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:p2}]})});
+      const d=await r.json(); let txt=d.content?.[0]?.text||'{}'; txt=txt.replace(/```json|```/g,'').trim();
+      results.push({ioc,p:JSON.parse(txt)});
+    }catch(e){ results.push({ioc,p:{verdict:'unknown',threat_score:0,summary:'Lookup failed'}}); }
+  }
+  el.innerHTML=results.map(({ioc,p})=>{
+    const c=p.verdict==='malicious'?'var(--red-text)':p.verdict==='suspicious'?'var(--amber-text)':'var(--green-text)';
+    return `<div class="intel-card" style="margin-bottom:6px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span class="ic-indicator" style="font-size:10px">${ioc.type}: ${ioc.value.substring(0,32)}${ioc.value.length>32?'…':''}</span>
+        <span style="font-family:var(--mono);font-size:9px;color:${c}">${(p.verdict||'').toUpperCase()} ${p.threat_score}/100</span>
+      </div>
+      <div style="font-size:10px;color:var(--ink-400)">${p.summary||''}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  SIEM
+// ══════════════════════════════════════════════════
+function toggleSIEM(){
+  document.getElementById('flyout-siem').classList.toggle('open');
+  document.getElementById('flyout-intel').classList.remove('open');
+}
+
+function renderSIEMSrcs(){
+  const el=document.getElementById('siem-src-list');
+  if(!siemSources.length){ el.innerHTML='<div class="sidebar-placeholder" style="padding:10px;text-align:left;font-size:9px">No sources connected</div>'; return; }
+  el.innerHTML=siemSources.map((s,i)=>`
+    <div class="siem-src-card ${s.status==='connected'?'connected':''}">
+      <div>
+        <div class="siem-src-name">${s.name}</div>
+        <div class="siem-src-url">${s.type.toUpperCase()} · ${s.url.substring(0,30)}${s.url.length>30?'…':''}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="siem-src-status">
+          <span style="width:5px;height:5px;border-radius:50%;background:${s.status==='connected'?'var(--green)':'var(--ink-500)'};display:inline-block"></span>
+          ${s.status}
+        </div>
+        <button class="btn btn-ghost" style="font-size:8px;padding:2px 8px" onclick="removeSIEM(${i})">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function addSIEM(){
+  const url=document.getElementById('siem-url').value.trim(); if(!url){alert('Enter a URL');return;}
+  const name=document.getElementById('siem-name').value.trim()||`${document.getElementById('siem-type').value.toUpperCase()} Source`;
+  siemSources.push({type:document.getElementById('siem-type').value,url,key:document.getElementById('siem-key').value,name,status:'connected'});
+  renderSIEMSrcs();
+  document.getElementById('siem-url').value=''; document.getElementById('siem-key').value=''; document.getElementById('siem-name').value='';
+  document.getElementById('siem-badge').style.display='block';
+}
+
+function removeSIEM(i){ siemSources.splice(i,1); renderSIEMSrcs(); if(!siemSources.length) document.getElementById('siem-badge').style.display='none'; }
+
+const FEED_TMPL=[
+  {sev:'CRITICAL',text:'Brute force on VPN gateway escalating',src:'Splunk'},
+  {sev:'HIGH',text:'PowerShell encoded command executed',src:'Elastic SIEM'},
+  {sev:'HIGH',text:'Outbound C2 connection flagged',src:'Sentinel'},
+  {sev:'MEDIUM',text:'Failed sudo attempt on prod server',src:'QRadar'},
+  {sev:'CRITICAL',text:'Kerberoasting activity in Active Directory',src:'Chronicle'},
+  {sev:'HIGH',text:'Large data transfer to external IP',src:'Splunk'},
+];
+
+function simulateFeed(){
+  if(feedTimer){ clearInterval(feedTimer); feedTimer=null; return; }
+  const el=document.getElementById('siem-feed'); el.innerHTML=''; let idx=0;
+  feedTimer=setInterval(()=>{
+    const t=FEED_TMPL[idx%FEED_TMPL.length]; idx++;
+    const now=new Date().toLocaleTimeString('en-GB',{hour12:false});
+    const d=document.createElement('div');
+    d.className=`feed-item feed-${t.sev.toLowerCase()}`;
+    d.innerHTML=`<div class="feed-time">${now} UTC</div><div class="feed-text">${t.text}</div><div class="feed-src">${t.src}</div>`;
+    el.insertBefore(d,el.firstChild);
+    if(el.children.length>10) el.removeChild(el.lastChild);
+    if(Math.random()>0.65 && ALERTS.length<10){
+      ALERTS.unshift({id:`ALT-${Date.now()}`,name:t.text,severity:t.sev,source:t.src,time:now,
+        host:`host-${Math.floor(Math.random()*999)}`,src_ip:`10.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}.${Math.floor(Math.random()*255)}`,
+        dest_ip:'N/A',user:`user${Math.floor(Math.random()*99)}`,action:'DETECTED',mitre:['T1059'],iocs:[],risk:t.sev==='CRITICAL'?90:t.sev==='HIGH'?70:50,
+        riskLabel:`${t.sev} Alert`,riskDetail:`Live from ${t.src}`,
+        timeline:[{t:now,cls:'tl-critical',ev:t.text,det:`Source: ${t.src}`}],
+        playbook:['Investigate source IP','Check affected host','Review SIEM for related events'],
+        rawLog:`[${new Date().toISOString()}] ${t.sev} ${t.src}: ${t.text}`});
+      renderQueue();
+    }
+  },2500);
+}
+
+// ══════════════════════════════════════════════════
+//  AUTO-TRIAGE ENGINE
+// ══════════════════════════════════════════════════
+function openTriage(){ document.getElementById('triage-overlay').classList.add('open'); }
+function closeTriage(){ document.getElementById('triage-overlay').classList.remove('open'); }
+
+async function runTriage(){
+  const spin=document.getElementById('triage-spin'); spin.style.display='inline-block';
+  const grid=document.getElementById('triage-grid');
+  grid.innerHTML=`<div style="font-family:var(--mono);font-size:9px;color:var(--ink-500);text-align:center;padding:40px;grid-column:1/-1"><span class="spin"></span>Scoring all alerts…</div>`;
+  const prompt=`You are a SOC triage AI. Score these ${ALERTS.length} alerts by priority. Return ONLY a JSON array (no markdown, no explanation).
+${ALERTS.map(a=>`ID:${a.id} | ${a.severity} | ${a.name} | MITRE:${a.mitre.join(',')} | Action:${a.action} | Risk:${a.risk}`).join('\n')}
+For each: {"id":"","total":0-100,"label":"risk summary","priority_rank":1-${ALERTS.length},"recommended_action":"short action","factors":{"Threat Intel":0-100,"Kill Chain Stage":0-100,"Asset Criticality":0-100,"Velocity":0-100,"IOC Confidence":0-100,"MITRE Coverage":0-100}}`;
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    let txt=d.content?.[0]?.text||'[]'; txt=txt.replace(/```json|```/g,'').trim();
+    const scores=JSON.parse(txt);
+    scores.forEach(s=>{ triageScores[s.id]=s; });
+    scores.sort((a,b)=>b.total-a.total);
+    grid.innerHTML=scores.map((s)=>{
+      const a=ALERTS.find(x=>x.id===s.id); if(!a)return'';
+      const acl=a.severity==='CRITICAL'?'tca-critical':a.severity==='HIGH'?'tca-high':a.severity==='MEDIUM'?'tca-medium':'tca-low';
+      const sc=scoreTextCls(s.total);
+      return `<div class="triage-card" onclick="closeTriage();selectAlert(${ALERTS.indexOf(a)})">
+        <div class="tc-left-accent ${acl}"></div>
+        <div class="tc-inner">
+          <div class="tc-top-row">
+            <div class="tc-score-block">
+              <div class="tc-score-n ${sc}">${s.total}</div>
+              <div class="tc-score-l">TRIAGE SCORE</div>
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:flex-end;gap:5px">
+              <span class="tc-rank-badge">#${s.priority_rank||1}</span>
+              <span class="sev-label ${sevSL(a.severity)}">${a.severity}</span>
+            </div>
+          </div>
+          <div class="tc-name">${a.name}</div>
+          <div class="tc-meta">${a.id} · ${a.host} · ${s.recommended_action||''}</div>
+          <div class="tc-factor-grid">
+            ${Object.entries(s.factors||{}).map(([k,v])=>`
+            <div class="tc-f-row">
+              <span class="tc-f-lbl">${k}</span>
+              <div class="tc-f-track"><div class="tc-f-fill" style="width:${v}%;background:${scoreColor(v)}"></div></div>
+              <span class="tc-f-val">${v}</span>
+            </div>`).join('')}
+          </div>
+          <div class="tc-label-row">${s.label||''}</div>
+        </div>
+      </div>`;
+    }).join('');
+    renderQueue();
+    if(currentAlert) renderOverview();
+  }catch(e){
+    grid.innerHTML=`<div style="font-family:var(--mono);font-size:9px;color:var(--red-text);text-align:center;padding:40px;grid-column:1/-1">Scoring failed: ${e.message}</div>`;
+  }
+  spin.style.display='none';
+}
+
+// ══════════════════════════════════════════════════
+//  TIMELINE / RAW / IOC / PLAYBOOK
+// ══════════════════════════════════════════════════
+function renderTimeline(){
+  document.getElementById('timeline-list').innerHTML=currentAlert.timeline.map(ev=>`
+    <div class="tl-item ${ev.cls}">
+      <div class="tl-time">${ev.t}</div>
+      <div><div class="tl-event">${ev.ev}</div><div class="tl-detail">${ev.det}</div></div>
+    </div>`).join('');
+}
+
+function renderRaw(){
+  document.getElementById('raw-log-box').textContent=currentAlert.rawLog;
+}
+
+function renderIOCs(){
+  const a=currentAlert;
+  document.getElementById('ioc-count').textContent=a.iocs.length;
+  const vc={malicious:'cb-red',suspicious:'cb-amber',clean:'cb-green'};
+  document.getElementById('ioc-list').innerHTML=a.iocs.length?`<div class="ioc-list">`+a.iocs.map(ioc=>`
+    <div class="ioc-row">
+      <div class="ioc-top-row">
+        <span class="count-badge ${vc[ioc.verdict]||'cb-blue'}" style="font-size:8px">${ioc.type} · ${ioc.verdict.toUpperCase()}</span>
+        <span class="ioc-score-lbl" style="color:${ioc.verdict==='malicious'?'var(--red-text)':ioc.verdict==='suspicious'?'var(--amber-text)':'var(--green-text)'}">${ioc.score}/100</span>
+      </div>
+      <div class="ioc-val">${ioc.value}</div>
+      <div class="ioc-detail">${ioc.detail}</div>
+    </div>`).join('')+`</div>`
+    :'<div class="sidebar-placeholder">No indicators</div>';
+}
+
+function renderPlaybook(){
+  const steps=currentAlert.playbook;
+  document.getElementById('pb-progress').textContent=`${completedSteps.size}/${steps.length}`;
+  document.getElementById('pb-list').innerHTML=steps.map((s,i)=>`
+    <div class="pb-step ${completedSteps.has(i)?'done':i===completedSteps.size?'pb-active':''}" onclick="toggleStep(${i})">
+      <div class="pb-num">${completedSteps.has(i)?'✓':i+1}</div>
+      <div class="pb-text">${s}</div>
+    </div>`).join('');
+}
+
+function toggleStep(i){ completedSteps.has(i)?completedSteps.delete(i):completedSteps.add(i); renderPlaybook(); }
+
+// ══════════════════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════════════════
+function switchTab(name){
+  const names=['overview','intel','timeline','raw','chat'];
+  document.querySelectorAll('.tab-btn').forEach((t,i)=>t.classList.toggle('active',names[i]===name));
+  document.querySelectorAll('.tab-pane').forEach(p=>p.classList.remove('active'));
+  document.getElementById(`tab-${name}`).classList.add('active');
+}
+
+// ══════════════════════════════════════════════════
+//  CHAT
+// ══════════════════════════════════════════════════
+function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+
+async function sendChat(){
+  const inp=document.getElementById('chat-input');
+  const q=inp.value.trim(); if(!q||isLoading||!currentAlert)return;
+  inp.value=''; isLoading=true; document.getElementById('chat-send').disabled=true;
+  addBubble(q,'bubble-user'); switchTab('chat');
+  const a=currentAlert;
+  const sys=`You are a Tier 1 SOC Analyst AI. Alert: ${a.name} | ${a.severity} | ${a.id} | Host: ${a.host} | IP: ${a.src_ip} | MITRE: ${a.mitre.join(',')} | Risk: ${a.risk}. Answer concisely and technically.`;
+  chatHistory.push({role:'user',content:q});
+  const thinking=addBubble('…','bubble-ai');
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:chatHistory})});
+    const d=await r.json();
+    const ans=d.content?.[0]?.text||'Unable to generate response.';
+    chatHistory.push({role:'assistant',content:ans});
+    thinking.textContent=ans;
+  }catch(e){ thinking.textContent='AI connection error.'; }
+  isLoading=false; document.getElementById('chat-send').disabled=false;
+}
+
+function addBubble(text,cls){
+  const el=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.className=`chat-bubble ${cls}`; d.textContent=text;
+  el.appendChild(d); el.scrollTop=el.scrollHeight;
+  return d;
+}
+
+// ══════════════════════════════════════════════════
+//  ALERT ACTIONS
+// ══════════════════════════════════════════════════
+function resetCenter(){
+  currentAlert=null;
+  document.getElementById('alert-header').classList.remove('visible');
+  document.getElementById('tab-bar').classList.remove('visible');
+  document.getElementById('chat-bar-wrap').classList.remove('visible');
+  document.getElementById('empty-state').classList.add('visible');
+  document.getElementById('ioc-list').innerHTML='<div class="sidebar-placeholder">Select an alert</div>';
+  document.getElementById('pb-list').innerHTML='<div class="sidebar-placeholder">Select an alert</div>';
+  document.getElementById('ai-text').textContent='Select an alert to begin analysis.';
+  document.getElementById('ai-text').classList.remove('loading');
+}
+
+function dismissAlert(){
+  if(!currentAlert||!confirm(`Mark ${currentAlert.id} as false positive?`))return;
+  ALERTS.splice(ALERTS.indexOf(currentAlert),1); resetCenter(); renderQueue();
+}
+function escalateAlert(){
+  if(!currentAlert)return; alert(`${currentAlert.id} escalated to Tier 2.`);
+}
+function closeAlert(){
+  if(!currentAlert||!confirm(`Close ${currentAlert.id} as resolved?`))return;
+  ALERTS.splice(ALERTS.indexOf(currentAlert),1); resetCenter(); renderQueue();
+}
+
+// ══════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════
+renderQueue();
+renderSIEMSrcs();
+</script>
+</body>
+</html>
