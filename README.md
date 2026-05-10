@@ -155,7 +155,7 @@ AI functionality requires backend API integration.
 ## Clone Repository
 
 ```bash
-git clone https://github.com/KickingCyb3r/Sentinel-Soc-Platform-.git
+git clone https://github.com/KickingCyb3r/Sentinel-SOC-Platform.git
 cd sentinel-soc-platform
 ```
 
@@ -288,7 +288,7 @@ Free to use, modify, and distribute with attribution.
 Cybersecurity | SOC Operations | Threat Analysis
 
 * LinkedIn: `linkedin.com/in/jariusglover1`
-* GitHub: `git clone https://github.com/KickingCyb3r/Sentinel-Soc-Platform-.git`
+* GitHub: `GitHub: github.com/KickingCyb3r`
 
 ---
 
