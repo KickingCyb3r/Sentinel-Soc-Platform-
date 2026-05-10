@@ -108,12 +108,14 @@ Supports webhook integration for:
 ---
 
 # Architecture
+```
 Browser Dashboard
 │
 ├── Alert Queue
 ├── AI Analysis Module
 ├── Threat Intelligence Module
 └── SIEM Integration Layer
+```
 The backend proxy handles:
 
 - API key security
@@ -201,14 +203,16 @@ http://localhost:3000
 ---
 
 # Investigation Workflow
-Review Alert Queue
-Prioritize Risk
-Investigate Alert
-Analyze Threat Intelligence
-Review Timeline & Logs
-Execute Response Playbook
-Document Findings
-Escalate or Close Incident
+```
+1. Review Alert Queue
+2. Prioritize Risk
+3. Investigate Alert
+4. Analyze Threat Intelligence
+5. Review Timeline & Logs
+6. Execute Response Playbook
+7. Document Findings
+8. Escalate or Close Incident
+```
 ---
 
 # MITRE ATT&CK Coverage
